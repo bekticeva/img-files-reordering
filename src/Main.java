@@ -14,8 +14,9 @@ public class Main {
         String output_folder_path = "C:\\Users\\User\\Documents\\usb backup\\test1";
         ImageScanner sc = new ImageScanner(folder_path);
         ImageCompare cmp = new ImageCompare();
-        Hasher hasher = new Hasher();
+        Hasher hasher = new Hasher(16);
         GroupOutput output = new GroupOutput(output_folder_path);
+        ColorHasher color_hasher = new ColorHasher();
 
         ArrayList<File> images = new ArrayList<>(sc.scan());
         ArrayList<Image> hashed_images = new ArrayList<>();
@@ -33,7 +34,8 @@ public class Main {
             }
             else{
                 String hash = hasher.hash(f);
-                Image p = new Image(img,hash);
+                double[] c_hash = color_hasher.colorHash(f);
+                Image p = new Image(img,hash,c_hash);
                 hashed_images.add(p);
 //                System.out.println("success: " + img.getName() + " -> " + hash);
             }
@@ -46,7 +48,8 @@ public class Main {
                 Image first = g.getImages().get(0);
 
                 int d = cmp.compare(img.getHash(), first.getHash());
-                if(d <= 1000){
+                double cd = cmp.compareColor(img.getColorHash(), first.getColorHash());
+                if(d <= 84){
                     g.addImage(img);
                     added = true;
                     break;
